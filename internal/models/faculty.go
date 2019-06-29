@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"awesome-portal-api/internal/dtos"
+	"time"
+)
 
 type Faculty struct {
 	ID        int
@@ -8,4 +11,18 @@ type Faculty struct {
 	UpdatedAt time.Time
 	ShortName string
 	LongName  string
+}
+
+func (f *Faculty) FromRequest(request *dtos.FacultyRequest) *Faculty {
+	f.ShortName = request.ShortName
+	f.LongName = request.LongName
+	return f
+}
+
+func (f *Faculty) ToResponse() *dtos.FacultyResponse {
+	return &dtos.FacultyResponse{
+		ID:        f.ID,
+		ShortName: f.ShortName,
+		LongName:  f.LongName,
+	}
 }

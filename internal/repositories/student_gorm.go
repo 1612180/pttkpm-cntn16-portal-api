@@ -61,32 +61,24 @@ func (g *StudentGorm) Create(student *models.Student, account *models.Account) e
 	return nil
 }
 
-func (g *StudentGorm) UpdateInfo(student *models.Student) error {
-	return nil
-}
-
-func (g *StudentGorm) UpdatePassword(account *models.Account) error {
-	return nil
-}
-
 func (g *StudentGorm) DeleteByMSSV(mssv string) error {
 	tx := g.DB.Begin()
 
 	// find student
 	var student models.Student
-	if err := g.DB.Where("mssv = ?", mssv).First(&student).Error; err != nil {
+	if err := tx.Where("mssv = ?", mssv).First(&student).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// delete account of student
-	if err := g.DB.Where("id = ?", mssv).Delete(&models.Account{}).Error; err != nil {
+	if err := tx.Where("id = ?", mssv).Delete(&models.Account{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// delete student
-	if err := g.DB.Delete(&student).Error; err != nil {
+	if err := tx.Delete(&student).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

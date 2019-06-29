@@ -12,8 +12,6 @@ type StudentRepo interface {
 	FindByID(id int) (*models.Student, error)
 	FindByMSSV(mssv string) (*models.Student, error)
 	Create(student *models.Student, account *models.Account) error
-	// UpdateInfo(student *models.Student) error
-	// UpdatePassword(account *models.Account) error
 	DeleteByMSSV(mssv string) error
 }
 
@@ -63,7 +61,7 @@ type FacultyRepo interface {
 }
 
 type Repos interface {
-	CreateAll() (StudentRepo, AccountRepo, ProgramRepo)
+	CreateAll() (StudentRepo, AccountRepo, ProgramRepo, FacultyRepo)
 }
 
 type ReposGorm struct {
@@ -74,7 +72,7 @@ func NewReposGorm(db *gorm.DB) Repos {
 	return &ReposGorm{DB: db}
 }
 
-func (r *ReposGorm) CreateAll() (StudentRepo, AccountRepo, ProgramRepo) {
+func (r *ReposGorm) CreateAll() (StudentRepo, AccountRepo, ProgramRepo, FacultyRepo) {
 	if os.Getenv("DATABASE_MODE") == "debug" {
 		r.DB.DropTableIfExists(&models.Account{})
 		r.DB.DropTableIfExists(&models.Student{})
@@ -99,5 +97,6 @@ func (r *ReposGorm) CreateAll() (StudentRepo, AccountRepo, ProgramRepo) {
 
 	return &StudentGorm{DB: r.DB},
 		&AccountGorm{DB: r.DB},
-		&ProgramGorm{DB: r.DB}
+		&ProgramGorm{DB: r.DB},
+		&FacultyGorm{DB: r.DB}
 }

@@ -35,19 +35,19 @@ func main() {
 	}()
 
 	// Create repo
-	repos := repositories.NewReposGorm(db)
-	studentRepo, accountRepo, programRepo := repos.CreateAll()
+	reposInterface := repositories.NewReposGorm(db)
+	studentRepo, accountRepo, programRepo, facultyRepo := reposInterface.CreateAll()
 
 	// Create service
-	sers := services.NewMyServices(studentRepo, accountRepo, programRepo)
-	studentService, programService := sers.CreateAll()
+	servicesInterface := services.NewMyServices(studentRepo, accountRepo, programRepo, facultyRepo)
+	studentService, programService, facultyService := servicesInterface.CreateAll()
 
 	// Create handler
-	hands := handlers.NewMyHandlers(studentService, programService)
-	studentHandler, programHandler := hands.CreateAll()
+	handlersInterface := handlers.NewMyHandlers(studentService, programService, facultyService)
+	studentHandler, programHandler, facultyHandler := handlersInterface.CreateAll()
 
 	// Set gin mode
-	gin.SetMode(os.Getenv("gin.mode"))
+	gin.SetMode(os.Getenv("GIN_MODE"))
 	if gin.Mode() == gin.DebugMode {
 		gin.DefaultWriter = colorable.NewColorableStdout()
 	} else {
@@ -75,6 +75,12 @@ func main() {
 		{
 			programAPI.GET("", programHandler.FetchAll)
 			programAPI.POST("", programHandler.Create)
+		}
+
+		facultyAPI := api.Group("/faculties")
+		{
+			facultyAPI.GET("", facultyHandler.FetchAll)
+			facultyAPI.POST("", facultyHandler.Create)
 		}
 	}
 

@@ -39,9 +39,31 @@ func (g ProgramGorm) Create(program *models.Program) error {
 }
 
 func (g ProgramGorm) DeleteByID(id int) error {
-	panic("implement me")
+	// find program
+	var program models.Program
+	if err := g.DB.Where("id = ?", id).First(&program).Error; err != nil {
+		return err
+	}
+
+	// delete program
+	if err := g.DB.Delete(&program).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (g ProgramGorm) DeleteByShort(short string) error {
-	panic("implement me")
+	// find program
+	var program models.Program
+	if err := g.DB.Where("short_name = ?", short).First(&program).Error; err != nil {
+		return err
+	}
+
+	// delete program
+	if err := g.DB.Delete(&program).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

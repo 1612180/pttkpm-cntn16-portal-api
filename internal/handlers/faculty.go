@@ -9,12 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ProgramHandler struct {
-	*services.ProgramService
+type FacultyHandler struct {
+	*services.FacultyService
 }
 
-func (h *ProgramHandler) FetchAll(c *gin.Context) {
-	responses, ok := h.ProgramService.FetchAll()
+func (h *FacultyHandler) FetchAll(c *gin.Context) {
+	responses, ok := h.FacultyService.FetchAll()
 	if !ok {
 		c.JSON(200, message.Create(false))
 		return
@@ -25,9 +25,9 @@ func (h *ProgramHandler) FetchAll(c *gin.Context) {
 	c.JSON(200, msg)
 }
 
-func (h *ProgramHandler) Create(c *gin.Context) {
+func (h *FacultyHandler) Create(c *gin.Context) {
 	// get json from client
-	var request dtos.ProgramRequest
+	var request dtos.FacultyRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
@@ -35,7 +35,7 @@ func (h *ProgramHandler) Create(c *gin.Context) {
 	}
 
 	// create by service
-	if ok := h.ProgramService.Create(&request); !ok {
+	if ok := h.FacultyService.Create(&request); !ok {
 		c.JSON(200, message.Create(false))
 		return
 	}
