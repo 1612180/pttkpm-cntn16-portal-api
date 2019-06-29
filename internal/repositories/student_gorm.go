@@ -69,7 +69,7 @@ func (g *StudentGorm) UpdatePassword(account *models.Account) error {
 	return nil
 }
 
-func (g *StudentGorm) Delete(mssv string) error {
+func (g *StudentGorm) DeleteByMSSV(mssv string) error {
 	tx := g.DB.Begin()
 
 	// find student

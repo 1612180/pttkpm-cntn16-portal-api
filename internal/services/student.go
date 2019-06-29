@@ -4,6 +4,7 @@ import (
 	"awesome-portal-api/internal/dtos"
 	"awesome-portal-api/internal/models"
 	"awesome-portal-api/internal/repositories"
+	"log"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -11,6 +12,7 @@ import (
 type StudentService struct {
 	repositories.StudentRepo
 	repositories.AccountRepo
+	repositories.ProgramRepo
 }
 
 func (s *StudentService) FetchAll() ([]*dtos.StudentResponse, error) {
@@ -21,9 +23,20 @@ func (s *StudentService) FetchAll() ([]*dtos.StudentResponse, error) {
 
 	var responses []*dtos.StudentResponse
 	for _, student := range students {
-		responses = append(responses, student.ToResponse())
-	}
+		response := student.ToResponse()
 
+		// get program
+		program, err := s.ProgramRepo.FindByID(student.ProgramID)
+		if err != nil {
+			log.Println(err)
+			log.Println("one response failed")
+			continue
+		}
+		response.ProgramShort = program.ShortName
+		response.ProgramLong = program.LongName
+
+		responses = append(responses, response)
+	}
 	return responses, nil
 }
 
@@ -32,7 +45,6 @@ func (s *StudentService) FindByID(id int) (*dtos.StudentResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return student.ToResponse(), nil
 }
 
@@ -49,11 +61,19 @@ func (s *StudentService) Create(request *dtos.StudentRequest) error {
 	// create student
 	student := (&models.Student{}).FromRequest(request)
 
+	// get program
+	program, err := s.ProgramRepo.FindByShort(request.ProgramShort)
+	if err != nil {
+		log.Println("program not found")
+		return err
+	}
+	student.ProgramID = program.ID
+
 	return s.StudentRepo.Create(student, account)
 }
 
 func (s *StudentService) Delete(mssv string) error {
-	return s.StudentRepo.Delete(mssv)
+	return s.StudentRepo.DeleteByMSSV(mssv)
 }
 
 func (s *StudentService) Validate(request *dtos.StudentRequest) error {
@@ -73,6 +93,5 @@ func (s *StudentService) Validate(request *dtos.StudentRequest) error {
 	if err = bcrypt.CompareHashAndPassword([]byte(account.HashedPassword), []byte(request.Password)); err != nil {
 		return err
 	}
-
 	return nil
 }

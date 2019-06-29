@@ -11,11 +11,11 @@ import (
 )
 
 type StudentHandler struct {
-	studentService *services.StudentService
+	*services.StudentService
 }
 
 func (h *StudentHandler) FetchAll(c *gin.Context) {
-	responses, err := h.studentService.FetchAll()
+	responses, err := h.StudentService.FetchAll()
 	if err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
@@ -35,7 +35,7 @@ func (h *StudentHandler) FindByID(c *gin.Context) {
 		return
 	}
 
-	response, err := h.studentService.FindByID(id)
+	response, err := h.StudentService.FindByID(id)
 	if err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
@@ -57,7 +57,7 @@ func (h *StudentHandler) Create(c *gin.Context) {
 	}
 
 	// create by service
-	if err := h.studentService.Create(&request); err != nil {
+	if err := h.StudentService.Create(&request); err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
 		return
@@ -67,7 +67,7 @@ func (h *StudentHandler) Create(c *gin.Context) {
 }
 
 func (h *StudentHandler) Delete(c *gin.Context) {
-	if err := h.studentService.Delete(c.Param("mssv")); err != nil {
+	if err := h.StudentService.Delete(c.Param("mssv")); err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
 		return
@@ -85,7 +85,7 @@ func (h *StudentHandler) Login(c *gin.Context) {
 		return
 	}
 
-	if err := h.studentService.Validate(&request); err != nil {
+	if err := h.StudentService.Validate(&request); err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
 		return

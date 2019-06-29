@@ -36,15 +36,15 @@ func main() {
 
 	// Create repo
 	repos := repositories.NewReposGorm(db)
-	studentRepo, accountRepo := repos.CreateAll()
+	studentRepo, accountRepo, programRepo := repos.CreateAll()
 
 	// Create service
-	sers := services.NewMyServices(studentRepo, accountRepo)
-	studentService := sers.CreateAll()
+	sers := services.NewMyServices(studentRepo, accountRepo, programRepo)
+	studentService, programService := sers.CreateAll()
 
 	// Create handler
-	hands := handlers.NewMyHandlers(studentService)
-	studentHandler := hands.CreateAll()
+	hands := handlers.NewMyHandlers(studentService, programService)
+	studentHandler, programHandler := hands.CreateAll()
 
 	// Set gin mode
 	gin.SetMode(os.Getenv("gin.mode"))
@@ -65,9 +65,16 @@ func main() {
 			studentAPI.POST("", studentHandler.Create)
 			studentAPI.DELETE("/:mssv", studentHandler.Delete)
 		}
+
 		authAPI := api.Group("/auth")
 		{
 			authAPI.POST("/login", studentHandler.Login)
+		}
+
+		programAPI := api.Group("/programs")
+		{
+			programAPI.GET("", programHandler.FetchAll)
+			programAPI.POST("", programHandler.Create)
 		}
 	}
 
