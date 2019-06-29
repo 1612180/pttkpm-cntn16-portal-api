@@ -1,26 +1,52 @@
 package main
 
 import (
-	"fmt"
+	"awesome-portal-api/internal/handlers"
+	"awesome-portal-api/internal/repositories"
+	"awesome-portal-api/internal/services"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"github.com/mattn/go-colorable"
 )
 
 func main() {
+	// Load env
 	err := godotenv.Load()
 	if err != nil {
 		log.Println(err)
 		log.Println("Error loading .env file")
 	}
 
-	port := os.Getenv("PORT")
-	fmt.Println(port)
+	// Load database
+	db, err := gorm.Open("postgres", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Println(err)
+		}
+	}()
 
+	// Create repo
+	repos := repositories.NewReposGorm(db)
+	studentRepo, accountRepo := repos.CreateAll()
+
+	// Create service
+	sers := services.NewMyServices(studentRepo, accountRepo)
+	studentService := sers.CreateAll()
+
+	// Create handler
+	hands := handlers.NewMyHandlers(studentService)
+	studentHandler := hands.CreateAll()
+
+	// Set gin mode
 	gin.SetMode(os.Getenv("gin.mode"))
 	if gin.Mode() == gin.DebugMode {
 		gin.DefaultWriter = colorable.NewColorableStdout()
@@ -30,10 +56,21 @@ func main() {
 
 	route := gin.Default()
 
-	route.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hi")
-	})
+	api := route.Group("/api")
+	{
+		studentAPI := api.Group("/students")
+		{
+			studentAPI.GET("", studentHandler.FetchAll)
+			studentAPI.GET("/:id", studentHandler.FindByID)
+			studentAPI.POST("", studentHandler.Create)
+		}
+		authAPI := api.Group("/auth")
+		{
+			authAPI.POST("/login", studentHandler.Login)
+		}
+	}
 
+	// Run gin
 	if err := route.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Println(err)
 		log.Fatal("Error running gin")
