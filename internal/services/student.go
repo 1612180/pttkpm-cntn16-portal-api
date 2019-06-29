@@ -52,6 +52,10 @@ func (s *StudentService) Create(request *dtos.StudentRequest) error {
 	return s.StudentRepo.Create(student, account)
 }
 
+func (s *StudentService) Delete(mssv string) error {
+	return s.StudentRepo.Delete(mssv)
+}
+
 func (s *StudentService) Validate(request *dtos.StudentRequest) error {
 	// find student of mssv
 	student, err := s.StudentRepo.FindByMSSV(request.MSSV)

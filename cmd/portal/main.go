@@ -63,6 +63,7 @@ func main() {
 			studentAPI.GET("", studentHandler.FetchAll)
 			studentAPI.GET("/:id", studentHandler.FindByID)
 			studentAPI.POST("", studentHandler.Create)
+			studentAPI.DELETE("/:mssv", studentHandler.Delete)
 		}
 		authAPI := api.Group("/auth")
 		{

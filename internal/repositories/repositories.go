@@ -20,6 +20,9 @@ type AccountRepo interface {
 	FindByID(id int) (*models.Account, error)
 }
 
+type SubjectRepo interface {
+}
+
 type Repos interface {
 	CreateAll() (StudentRepo, AccountRepo)
 }

@@ -66,6 +66,16 @@ func (h *StudentHandler) Create(c *gin.Context) {
 	c.JSON(200, message.Create(true))
 }
 
+func (h *StudentHandler) Delete(c *gin.Context) {
+	if err := h.studentService.Delete(c.Param("mssv")); err != nil {
+		log.Println(err)
+		c.JSON(200, message.Create(false))
+		return
+	}
+
+	c.JSON(200, message.Create(true))
+}
+
 func (h *StudentHandler) Login(c *gin.Context) {
 	// get json from client
 	var request dtos.StudentRequest
