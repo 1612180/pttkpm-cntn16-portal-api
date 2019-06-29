@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"awesome-portal-api/internal/models"
+	"log"
 
 	"github.com/jinzhu/gorm"
 )
@@ -10,60 +11,74 @@ type ProgramGorm struct {
 	*gorm.DB
 }
 
-func (g ProgramGorm) FetchAll() ([]*models.Program, error) {
+func (g ProgramGorm) FetchAll() ([]*models.Program, bool) {
 	var programs []*models.Program
 	if err := g.DB.Find(&programs).Error; err != nil {
-		return nil, err
+		return nil, false
 	}
-	return programs, nil
+	return programs, true
 }
 
-func (g ProgramGorm) FindByID(id int) (*models.Program, error) {
+func (g ProgramGorm) FindByID(id int) (*models.Program, bool) {
 	var program models.Program
 	if err := g.DB.Where("id = ?", id).First(&program).Error; err != nil {
-		return nil, err
+		log.Println(err)
+		log.Printf("program %d not found\n", id)
+		return nil, false
 	}
-	return &program, nil
+	return &program, true
 }
 
-func (g ProgramGorm) FindByShort(short string) (*models.Program, error) {
+func (g ProgramGorm) FindByShort(short string) (*models.Program, bool) {
 	var program models.Program
 	if err := g.DB.Where("short_name = ?", short).First(&program).Error; err != nil {
-		return nil, err
+		log.Println(err)
+		log.Printf("program %s not found\n", short)
+		return nil, false
 	}
-	return &program, nil
+	return &program, true
 }
 
-func (g ProgramGorm) Create(program *models.Program) error {
-	return g.DB.Create(program).Error
+func (g ProgramGorm) Create(program *models.Program) bool {
+	if err := g.DB.Create(program).Error; err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
 }
 
-func (g ProgramGorm) DeleteByID(id int) error {
+func (g ProgramGorm) DeleteByID(id int) bool {
 	// find program
 	var program models.Program
 	if err := g.DB.Where("id = ?", id).First(&program).Error; err != nil {
-		return err
+		log.Println(err)
+		log.Printf("program %d not found\n", id)
+		return false
 	}
 
 	// delete program
 	if err := g.DB.Delete(&program).Error; err != nil {
-		return err
+		log.Println(err)
+		return false
 	}
 
-	return nil
+	return false
 }
 
-func (g ProgramGorm) DeleteByShort(short string) error {
+func (g ProgramGorm) DeleteByShort(short string) bool {
 	// find program
 	var program models.Program
 	if err := g.DB.Where("short_name = ?", short).First(&program).Error; err != nil {
-		return err
+		log.Println(err)
+		log.Printf("program %s not found\n", short)
+		return false
 	}
 
 	// delete program
 	if err := g.DB.Delete(&program).Error; err != nil {
-		return err
+		log.Println(err)
+		return false
 	}
 
-	return nil
+	return true
 }

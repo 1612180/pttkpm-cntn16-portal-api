@@ -8,56 +8,56 @@ import (
 )
 
 type StudentRepo interface {
-	FetchAll() ([]*models.Student, error)
-	FindByID(id int) (*models.Student, error)
-	FindByMSSV(mssv string) (*models.Student, error)
-	Create(student *models.Student, account *models.Account) error
-	DeleteByMSSV(mssv string) error
+	FetchAll() ([]*models.Student, bool)
+	FindByID(id int) (*models.Student, bool)
+	FindByMSSV(mssv string) (*models.Student, bool)
+	Create(student *models.Student, account *models.Account) bool
+	DeleteByMSSV(mssv string) bool
 }
 
 type AccountRepo interface {
-	FindByID(id int) (*models.Account, error)
+	FindByID(id int) (*models.Account, bool)
 }
 
 type SubjectRepo interface {
-	FetchAll() ([]*models.Subject, error)
-	FindByID(id int) (*models.Subject, error)
-	Create(subject *models.Subject) error
-	DeleteByID(id int) error
+	FetchAll() ([]*models.Subject, bool)
+	FindByID(id int) (*models.Subject, bool)
+	Create(subject *models.Subject) bool
+	DeleteByID(id int) bool
 }
 
 type SubjectTypeRepo interface {
-	FetchAll() ([]*models.SubjectType, error)
-	FindByID(id int) (*models.SubjectType, error)
-	FindByShort(short string) (*models.SubjectType, error)
-	Create(subjectType models.SubjectType) error
-	DeleteByID(id int) error
-	DeleteByShort(short string) error
+	FetchAll() ([]*models.SubjectType, bool)
+	FindByID(id int) (*models.SubjectType, bool)
+	FindByShort(short string) (*models.SubjectType, bool)
+	Create(subjectType models.SubjectType) bool
+	DeleteByID(id int) bool
+	DeleteByShort(short string) bool
 }
 
 type SubjectPrerequisiteRepo interface {
-	FetchAll() ([]*models.SubjectPrerequisite, error)
-	FindByID(id int) (*models.SubjectPrerequisite, error)
-	Create(subjectType models.SubjectPrerequisite) error
-	DeleteByID(id int) error
+	FetchAll() ([]*models.SubjectPrerequisite, bool)
+	FindByID(id int) (*models.SubjectPrerequisite, bool)
+	Create(subjectType models.SubjectPrerequisite) bool
+	DeleteByID(id int) bool
 }
 
 type ProgramRepo interface {
-	FetchAll() ([]*models.Program, error)
-	FindByID(id int) (*models.Program, error)
-	FindByShort(short string) (*models.Program, error)
-	Create(program *models.Program) error
-	DeleteByID(id int) error
-	DeleteByShort(short string) error
+	FetchAll() ([]*models.Program, bool)
+	FindByID(id int) (*models.Program, bool)
+	FindByShort(short string) (*models.Program, bool)
+	Create(program *models.Program) bool
+	DeleteByID(id int) bool
+	DeleteByShort(short string) bool
 }
 
 type FacultyRepo interface {
-	FetchAll() ([]*models.Faculty, error)
-	FindByID(id int) (*models.Faculty, error)
-	FindByShort(short string) (*models.Faculty, error)
-	Create(program *models.Faculty) error
-	DeleteByID(id int) error
-	DeleteByShort(short string) error
+	FetchAll() ([]*models.Faculty, bool)
+	FindByID(id int) (*models.Faculty, bool)
+	FindByShort(short string) (*models.Faculty, bool)
+	Create(program *models.Faculty) bool
+	DeleteByID(id int) bool
+	DeleteByShort(short string) bool
 }
 
 type Repos interface {

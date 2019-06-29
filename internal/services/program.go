@@ -4,7 +4,6 @@ import (
 	"awesome-portal-api/internal/dtos"
 	"awesome-portal-api/internal/models"
 	"awesome-portal-api/internal/repositories"
-	"log"
 )
 
 type ProgramService struct {
@@ -12,9 +11,8 @@ type ProgramService struct {
 }
 
 func (s *ProgramService) FetchAll() ([]*dtos.ProgramResponse, bool) {
-	programs, err := s.ProgramRepo.FetchAll()
-	if err != nil {
-		log.Println(err)
+	programs, ok := s.ProgramRepo.FetchAll()
+	if !ok {
 		return nil, false
 	}
 
@@ -27,8 +25,7 @@ func (s *ProgramService) FetchAll() ([]*dtos.ProgramResponse, bool) {
 
 func (s *ProgramService) Create(request *dtos.ProgramRequest) bool {
 	program := (&models.Program{}).FromRequest(request)
-	if err := s.ProgramRepo.Create(program); err != nil {
-		log.Println(err)
+	if ok := s.ProgramRepo.Create(program); !ok {
 		return false
 	}
 	return true
