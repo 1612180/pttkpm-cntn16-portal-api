@@ -11,8 +11,8 @@ type StudentRepo interface {
 	FindByID(id int) (*models.Student, error)
 	FindByMSSV(mssv string) (*models.Student, error)
 	Create(student *models.Student, account *models.Account) error
-	UpdateInfo(student *models.Student) error
-	UpdatePassword(account *models.Account) error
+	// UpdateInfo(student *models.Student) error
+	// UpdatePassword(account *models.Account) error
 	Delete(mssv string) error
 }
 
@@ -21,6 +21,15 @@ type AccountRepo interface {
 }
 
 type SubjectRepo interface {
+	FetchAll() ([]*models.Subject, error)
+	FindByID(id int) (*models.Subject, error)
+	Create(subject *models.Subject) error
+	Delete(id int) error
+}
+
+type SubjectTypeRepo interface {
+	FetchAll() ([]*models.SubjectType, error)
+	FindByID(id int) *models.SubjectType
 }
 
 type Repos interface {
