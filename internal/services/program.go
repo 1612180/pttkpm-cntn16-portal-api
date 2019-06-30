@@ -25,8 +25,5 @@ func (s *ProgramService) FetchAll() ([]*dtos.ProgramResponse, bool) {
 
 func (s *ProgramService) Create(request *dtos.ProgramRequest) bool {
 	program := (&models.Program{}).FromRequest(request)
-	if ok := s.ProgramRepo.Create(program); !ok {
-		return false
-	}
-	return true
+	return s.ProgramRepo.Create(program)
 }

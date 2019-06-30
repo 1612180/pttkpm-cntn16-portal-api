@@ -30,7 +30,7 @@ type SubjectTypeRepo interface {
 	FetchAll() ([]*models.SubjectType, bool)
 	FindByID(id int) (*models.SubjectType, bool)
 	FindByShort(short string) (*models.SubjectType, bool)
-	Create(subjectType models.SubjectType) bool
+	Create(subjectType *models.SubjectType) bool
 	DeleteByID(id int) bool
 	DeleteByShort(short string) bool
 }
@@ -38,7 +38,7 @@ type SubjectTypeRepo interface {
 type SubjectPrerequisiteRepo interface {
 	FetchAll() ([]*models.SubjectPrerequisite, bool)
 	FindByID(id int) (*models.SubjectPrerequisite, bool)
-	Create(subjectType models.SubjectPrerequisite) bool
+	Create(subjectType *models.SubjectPrerequisite) bool
 	DeleteByID(id int) bool
 }
 
@@ -67,6 +67,7 @@ type Repos interface {
 		ProgramRepo,
 		FacultyRepo,
 		SubjectRepo,
+		SubjectTypeRepo,
 	)
 }
 
@@ -84,6 +85,7 @@ func (r *ReposGorm) CreateAll() (
 	ProgramRepo,
 	FacultyRepo,
 	SubjectRepo,
+	SubjectTypeRepo,
 ) {
 	if os.Getenv("DATABASE_MODE") == "debug" {
 		r.DB.DropTableIfExists(&models.Account{})
@@ -111,5 +113,6 @@ func (r *ReposGorm) CreateAll() (
 		&AccountGorm{DB: r.DB},
 		&ProgramGorm{DB: r.DB},
 		&FacultyGorm{DB: r.DB},
-		&SubjectGorm{DB: r.DB}
+		&SubjectGorm{DB: r.DB},
+		&SubjectTypeGorm{DB: r.DB}
 }

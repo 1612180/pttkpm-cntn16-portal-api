@@ -39,6 +39,14 @@ func (s *SubjectService) FetchAll() ([]*dtos.SubjectResponse, bool) {
 		response.FacultyShort = faculty.ShortName
 		response.FacultyLong = faculty.LongName
 
+		// get type
+		subjectType, ok := s.SubjectTypeRepo.FindByID(subject.SubjectTypeID)
+		if !ok {
+			continue
+		}
+		response.SubjectTypeShort = subjectType.ShortName
+		response.SubjectTypeLong = subjectType.LongName
+
 		responses = append(responses, response)
 	}
 	return responses, true
@@ -68,6 +76,14 @@ func (s *SubjectService) FindByID(id int) (*dtos.SubjectResponse, bool) {
 	response.FacultyShort = faculty.ShortName
 	response.FacultyLong = faculty.LongName
 
+	// get type
+	subjectType, ok := s.SubjectTypeRepo.FindByID(subject.SubjectTypeID)
+	if !ok {
+		return nil, false
+	}
+	response.SubjectTypeShort = subjectType.ShortName
+	response.SubjectTypeLong = subjectType.LongName
+
 	return response, true
 }
 
@@ -87,6 +103,13 @@ func (s *SubjectService) Create(request *dtos.SubjectRequest) bool {
 		return false
 	}
 	subject.FacultyID = faculty.ID
+
+	// get type
+	subjectType, ok := s.SubjectTypeRepo.FindByShort(request.SubjectTypeShort)
+	if !ok {
+		return false
+	}
+	subject.SubjectTypeID = subjectType.ID
 
 	if ok := s.SubjectRepo.Create(subject); !ok {
 		return false

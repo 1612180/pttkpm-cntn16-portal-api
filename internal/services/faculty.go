@@ -25,8 +25,5 @@ func (s *FacultyService) FetchAll() ([]*dtos.FacultyResponse, bool) {
 
 func (s *FacultyService) Create(request *dtos.FacultyRequest) bool {
 	faculty := (&models.Faculty{}).FromRequest(request)
-	if ok := s.FacultyRepo.Create(faculty); !ok {
-		return false
-	}
-	return true
+	return s.FacultyRepo.Create(faculty)
 }

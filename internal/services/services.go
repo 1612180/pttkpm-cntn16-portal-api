@@ -3,7 +3,13 @@ package services
 import "awesome-portal-api/internal/repositories"
 
 type Services interface {
-	CreateAll() (*StudentService, *ProgramService, *FacultyService, *SubjectService)
+	CreateAll() (
+		*StudentService,
+		*ProgramService,
+		*FacultyService,
+		*SubjectService,
+		*SubjectTypeService,
+	)
 }
 
 type MyServices struct {
@@ -12,6 +18,7 @@ type MyServices struct {
 	repositories.ProgramRepo
 	repositories.FacultyRepo
 	repositories.SubjectRepo
+	repositories.SubjectTypeRepo
 }
 
 func NewMyServices(
@@ -20,17 +27,25 @@ func NewMyServices(
 	programRepo repositories.ProgramRepo,
 	facultyRepo repositories.FacultyRepo,
 	subjectRepo repositories.SubjectRepo,
+	subjectTypeRepo repositories.SubjectTypeRepo,
 ) Services {
 	return &MyServices{
-		StudentRepo: studentRepo,
-		AccountRepo: accountRepo,
-		ProgramRepo: programRepo,
-		FacultyRepo: facultyRepo,
-		SubjectRepo: subjectRepo,
+		StudentRepo:     studentRepo,
+		AccountRepo:     accountRepo,
+		ProgramRepo:     programRepo,
+		FacultyRepo:     facultyRepo,
+		SubjectRepo:     subjectRepo,
+		SubjectTypeRepo: subjectTypeRepo,
 	}
 }
 
-func (s *MyServices) CreateAll() (*StudentService, *ProgramService, *FacultyService, *SubjectService) {
+func (s *MyServices) CreateAll() (
+	*StudentService,
+	*ProgramService,
+	*FacultyService,
+	*SubjectService,
+	*SubjectTypeService,
+) {
 	return &StudentService{
 			StudentRepo: s.StudentRepo,
 			AccountRepo: s.AccountRepo,
@@ -45,8 +60,11 @@ func (s *MyServices) CreateAll() (*StudentService, *ProgramService, *FacultyServ
 		},
 		&SubjectService{
 			SubjectRepo:     s.SubjectRepo,
-			SubjectTypeRepo: nil,
+			SubjectTypeRepo: s.SubjectTypeRepo,
 			ProgramRepo:     s.ProgramRepo,
 			FacultyRepo:     s.FacultyRepo,
+		},
+		&SubjectTypeService{
+			SubjectTypeRepo: s.SubjectTypeRepo,
 		}
 }

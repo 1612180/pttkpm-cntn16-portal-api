@@ -19,6 +19,9 @@ GET     /api/subjects
 GET     /api/subjects/:id
 POST    /api/subjects
 DELETE  /api/subjects/:id
+
+GET     /api/subject_types
+POST    /api/subject_types
 ```
 
 Sample `.env`

@@ -24,7 +24,6 @@ func (g *StudentGorm) FindByID(id int) (*models.Student, bool) {
 	var student models.Student
 	if err := g.DB.Where("id = ?", id).First(&student).Error; err != nil {
 		log.Println(err)
-		log.Printf("student %d not found\n", id)
 		return nil, false
 	}
 	return &student, true
@@ -34,7 +33,6 @@ func (g *StudentGorm) FindByMSSV(mssv string) (*models.Student, bool) {
 	var student models.Student
 	if err := g.DB.Where("mssv = ?", mssv).First(&student).Error; err != nil {
 		log.Println(err)
-		log.Printf("student %s not found\n", mssv)
 		return nil, false
 	}
 	return &student, true
@@ -46,7 +44,6 @@ func (g *StudentGorm) Create(student *models.Student, account *models.Account) b
 	// check if db already has mssv
 	if !tx.Where("mssv = ?", student.MSSV).First(&models.Student{}).RecordNotFound() {
 		tx.Rollback()
-		log.Printf("student %s found\n", student.MSSV)
 		return false
 	}
 
@@ -77,14 +74,13 @@ func (g *StudentGorm) DeleteByMSSV(mssv string) bool {
 	if err := tx.Where("mssv = ?", mssv).First(&student).Error; err != nil {
 		tx.Rollback()
 		log.Println(err)
-		log.Printf("student %s not found\n", mssv)
 		return false
 	}
 
 	// delete account of student
 	if err := tx.Where("id = ?", student.AccountID).Delete(&models.Account{}).Error; err != nil {
 		tx.Rollback()
-		log.Printf("account %d not found\n", student.AccountID)
+		log.Println(err)
 		return false
 	}
 

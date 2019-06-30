@@ -11,7 +11,7 @@ type FacultyGorm struct {
 	*gorm.DB
 }
 
-func (g FacultyGorm) FetchAll() ([]*models.Faculty, bool) {
+func (g *FacultyGorm) FetchAll() ([]*models.Faculty, bool) {
 	var faculties []*models.Faculty
 	if err := g.DB.Find(&faculties).Error; err != nil {
 		log.Println(err)
@@ -20,7 +20,7 @@ func (g FacultyGorm) FetchAll() ([]*models.Faculty, bool) {
 	return faculties, true
 }
 
-func (g FacultyGorm) FindByID(id int) (*models.Faculty, bool) {
+func (g *FacultyGorm) FindByID(id int) (*models.Faculty, bool) {
 	var faculty models.Faculty
 	if err := g.DB.Where("id = ?", id).First(&faculty).Error; err != nil {
 		log.Println(err)
@@ -29,7 +29,7 @@ func (g FacultyGorm) FindByID(id int) (*models.Faculty, bool) {
 	return &faculty, true
 }
 
-func (g FacultyGorm) FindByShort(short string) (*models.Faculty, bool) {
+func (g *FacultyGorm) FindByShort(short string) (*models.Faculty, bool) {
 	var faculty models.Faculty
 	if err := g.DB.Where("short_name = ?", short).First(&faculty).Error; err != nil {
 		log.Println(err)
@@ -38,7 +38,7 @@ func (g FacultyGorm) FindByShort(short string) (*models.Faculty, bool) {
 	return &faculty, true
 }
 
-func (g FacultyGorm) Create(program *models.Faculty) bool {
+func (g *FacultyGorm) Create(program *models.Faculty) bool {
 	if err := g.DB.Create(program).Error; err != nil {
 		log.Println(err)
 		return false
@@ -46,34 +46,16 @@ func (g FacultyGorm) Create(program *models.Faculty) bool {
 	return true
 }
 
-func (g FacultyGorm) DeleteByID(id int) bool {
-	// find faculty
-	var faculty models.Faculty
-	if err := g.DB.Where("id = ?", id).First(&faculty).Error; err != nil {
-		log.Println(err)
-		log.Printf("faculty %d not found\n", id)
-		return false
-	}
-
-	// delete faculty
-	if err := g.DB.Delete(&faculty).Error; err != nil {
+func (g *FacultyGorm) DeleteByID(id int) bool {
+	if err := g.DB.Where("id = ?", id).Delete(&models.Faculty{}).Error; err != nil {
 		log.Println(err)
 		return false
 	}
 	return true
 }
 
-func (g FacultyGorm) DeleteByShort(short string) bool {
-	// find faculty
-	var faculty models.Faculty
-	if err := g.DB.Where("short_name = ?", short).First(&faculty).Error; err != nil {
-		log.Println(err)
-		log.Printf("faculty %s not found\n", short)
-		return false
-	}
-
-	// delete faculty
-	if err := g.DB.Delete(&faculty).Error; err != nil {
+func (g *FacultyGorm) DeleteByShort(short string) bool {
+	if err := g.DB.Where("short_name = ?", short).Delete(&models.Faculty{}).Error; err != nil {
 		log.Println(err)
 		return false
 	}

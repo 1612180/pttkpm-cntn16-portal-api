@@ -15,7 +15,6 @@ func (g *AccountGorm) FindByID(id int) (*models.Account, bool) {
 	var account models.Account
 	if err := g.DB.Where("id = ?", id).First(&account).Error; err != nil {
 		log.Println(err)
-		log.Printf("account %d not found\n", id)
 		return nil, false
 	}
 	return &account, true

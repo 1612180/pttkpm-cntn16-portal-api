@@ -40,7 +40,8 @@ func main() {
 		accountRepo,
 		programRepo,
 		facultyRepo,
-		subjectRepo := reposInterface.CreateAll()
+		subjectRepo,
+		subjectTypeRepo := reposInterface.CreateAll()
 
 	// Create service
 	servicesInterface := services.NewMyServices(
@@ -49,11 +50,13 @@ func main() {
 		programRepo,
 		facultyRepo,
 		subjectRepo,
+		subjectTypeRepo,
 	)
 	studentService,
 		programService,
 		facultyService,
-		subjectService := servicesInterface.CreateAll()
+		subjectService,
+		subjectTypeService := servicesInterface.CreateAll()
 
 	// Create handler
 	handlersInterface := handlers.NewMyHandlers(
@@ -61,11 +64,13 @@ func main() {
 		programService,
 		facultyService,
 		subjectService,
+		subjectTypeService,
 	)
 	studentHandler,
 		programHandler,
 		facultyHandler,
-		subjectHandler := handlersInterface.CreateAll()
+		subjectHandler,
+		subjectTypeHandler := handlersInterface.CreateAll()
 
 	// Set gin mode
 	gin.SetMode(os.Getenv("GIN_MODE"))
@@ -110,6 +115,12 @@ func main() {
 			subjectAPI.GET("/:id", subjectHandler.FindByID)
 			subjectAPI.POST("", subjectHandler.Create)
 			subjectAPI.DELETE("/:id", subjectHandler.DeleteByID)
+		}
+
+		subjectTypeAPI := api.Group("/subject_types")
+		{
+			subjectTypeAPI.GET("", subjectTypeHandler.FetchAll)
+			subjectTypeAPI.POST("", subjectTypeHandler.Create)
 		}
 	}
 
