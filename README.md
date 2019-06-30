@@ -2,30 +2,20 @@
 
 API endpoints
 ```
-GET     /api/students
-GET     /api/students/:id
-POST    /api/students
-DELETE  /api/students/:mssv
+GET     /students/:mssv
+POST    /students
+DELETE  /students/:mssv
+POST    /auth/login
 
-POST    /api/auth/login
+POST    /programs
+POST    /faculties
 
-GET     /api/programs
-POST    /api/programs
+GET     /subjects/:id
+POST    /subjects
+POST    /type_subs
 
-GET     /api/faculties
-POST    /api/faculties
-
-GET     /api/subjects
-GET     /api/subjects/:id
-POST    /api/subjects
-DELETE  /api/subjects/:id
-
-GET     /api/subject_types
-POST    /api/subject_types
-
-GET     /api/student_subjects
-GET     /api/student_subjects/students/:student_id/subjects/:subject_id
-POST    /api/student_subjects
+POST    /enrolls
+POST    /scores
 ```
 
 Sample `.env`
@@ -33,4 +23,5 @@ Sample `.env`
 PORT=8080
 GIN_MODE=debug
 DATABASE_URL=postgres://postgres@localhost:54320/postgres?sslmode=disable
+DATABASE_MODE=debug
 ```

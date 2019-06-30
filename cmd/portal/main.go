@@ -1,9 +1,9 @@
 package main
 
 import (
-	"awesome-portal-api/internal/handlers"
-	"awesome-portal-api/internal/repositories"
-	"awesome-portal-api/internal/services"
+	"awesome-portal-api/internal/service"
+	"awesome-portal-api/internal/storage"
+	"awesome-portal-api/internal/transport"
 	"log"
 	"os"
 
@@ -11,7 +11,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
-	"github.com/mattn/go-colorable"
 )
 
 func main() {
@@ -34,108 +33,68 @@ func main() {
 		}
 	}()
 
-	// Create repo
-	reposInterface := repositories.NewReposGorm(db)
-	studentRepo,
-		accountRepo,
-		programRepo,
-		facultyRepo,
-		subjectRepo,
-		subjectTypeRepo,
-		studentSubjectRepo := reposInterface.CreateAll()
+	// Migrate db
+	storage.MigrateAll(db)
 
-	// Create service
-	servicesInterface := services.NewMyServices(
-		studentRepo,
-		accountRepo,
-		programRepo,
-		facultyRepo,
-		subjectRepo,
-		subjectTypeRepo,
-		studentSubjectRepo,
-	)
-	studentService,
-		programService,
-		facultyService,
-		subjectService,
-		subjectTypeService,
-		studentSubjectService := servicesInterface.CreateAll()
+	// Load storage
+	studentStorage := storage.NewStudentStorage(db)
+	programStorage := storage.NewProgramStorage(db)
+	facultyStorage := storage.NewFacultyStorage(db)
+	subjectStorage := storage.NewSubjectStorage(db)
+	typeSubStorage := storage.NewTypeSubStorage(db)
+	enrollStorage := storage.NewEnrollStorage(db)
+	scoreStorage := storage.NewScoreStorage(db)
 
-	// Create handler
-	handlersInterface := handlers.NewMyHandlers(
-		studentService,
-		programService,
-		facultyService,
-		subjectService,
-		subjectTypeService,
-		studentSubjectService,
-	)
-	studentHandler,
-		programHandler,
-		facultyHandler,
-		subjectHandler,
-		subjectTypeHandler,
-		studentSubjectHandler := handlersInterface.CreateAll()
-
-	// Set gin mode
-	gin.SetMode(os.Getenv("GIN_MODE"))
-	if gin.Mode() == gin.DebugMode {
-		gin.DefaultWriter = colorable.NewColorableStdout()
-	} else {
-		gin.DisableConsoleColor()
+	// Load service
+	studentService := service.StudentService{
+		StudentStorage: studentStorage,
+		ProgramStorage: programStorage,
+		FacultyStorage: facultyStorage,
+		SubjectStorage: subjectStorage,
+		TypeSubStorage: typeSubStorage,
+		EnrollStorage:  enrollStorage,
+		ScoreStorage:   scoreStorage,
 	}
+	programService := service.ProgramService{ProgramStorage: programStorage}
+	facultyService := service.FacultyService{FacultyStorage: facultyStorage}
+	subjectService := service.SubjectService{
+		SubjectStorage: subjectStorage,
+		ProgramStorage: programStorage,
+		FacultyStorage: facultyStorage,
+		TypeSubStorage: typeSubStorage,
+	}
+	typeSubService := service.TypeSubService{TypeSubStorage: typeSubStorage}
+	enrollService := service.EnrollService{EnrollStorage: enrollStorage}
+	scoreService := service.ScoreService{ScoreStorage: scoreStorage}
 
+	// Load transport
+	studentTransport := transport.StudentTransport{StudentService: &studentService}
+	programTransport := transport.ProgramTransport{ProgramService: &programService}
+	facultyTransport := transport.FacultyTransport{FacultyService: &facultyService}
+	subjectTransport := transport.SubjectTransport{SubjectService: &subjectService}
+	typeSubTransport := transport.TypeSubTransport{TypeSubService: &typeSubService}
+	enrollTransport := transport.EnrollTransport{EnrollService: &enrollService}
+	scoreTransport := transport.ScoreTransport{ScoreService: &scoreService}
+
+	// Config gin
+	gin.SetMode(os.Getenv("GIN_MODE"))
+	gin.DisableConsoleColor()
 	route := gin.Default()
 
-	api := route.Group("/api")
-	{
-		studentAPI := api.Group("/students")
-		{
-			studentAPI.GET("", studentHandler.FetchAll)
-			studentAPI.GET("/:id", studentHandler.FindByID)
-			studentAPI.POST("", studentHandler.Create)
-			studentAPI.DELETE("/:mssv", studentHandler.DeleteByMSSV)
-		}
+	route.GET("/students/:mssv", studentTransport.StudentByMSSV)
+	route.POST("/students", studentTransport.Save)
+	route.DELETE("/students/:mssv", studentTransport.DeleteByMSSV)
+	route.POST("/auth/login", studentTransport.Validate)
 
-		authAPI := api.Group("/auth")
-		{
-			authAPI.POST("/login", studentHandler.Login)
-		}
+	route.POST("/programs", programTransport.Save)
+	route.POST("/faculties", facultyTransport.Save)
 
-		programAPI := api.Group("/programs")
-		{
-			programAPI.GET("", programHandler.FetchAll)
-			programAPI.POST("", programHandler.Create)
-		}
+	route.GET("/subjects/:id", subjectTransport.Subject)
+	route.POST("/subjects", subjectTransport.Save)
+	route.POST("/type_subs", typeSubTransport.Save)
 
-		facultyAPI := api.Group("/faculties")
-		{
-			facultyAPI.GET("", facultyHandler.FetchAll)
-			facultyAPI.POST("", facultyHandler.Create)
-		}
-
-		subjectAPI := api.Group("/subjects")
-		{
-			subjectAPI.GET("", subjectHandler.FetchAll)
-			subjectAPI.GET("/:id", subjectHandler.FindByID)
-			subjectAPI.POST("", subjectHandler.Create)
-			subjectAPI.DELETE("/:id", subjectHandler.DeleteByID)
-		}
-
-		subjectTypeAPI := api.Group("/subject_types")
-		{
-			subjectTypeAPI.GET("", subjectTypeHandler.FetchAll)
-			subjectTypeAPI.POST("", subjectTypeHandler.Create)
-		}
-
-		studentSubjectAPI := api.Group("/student_subjects")
-		{
-			studentSubjectAPI.GET("", studentSubjectHandler.FetchAll)
-			studentSubjectAPI.GET("/students/:student_id/subjects/:subject_id",
-				studentSubjectHandler.FindByID)
-			studentSubjectAPI.POST("", studentSubjectHandler.Create)
-		}
-	}
+	route.POST("/enrolls", enrollTransport.Save)
+	route.POST("/scores", scoreTransport.Save)
 
 	// Run gin
 	if err := route.Run(":" + os.Getenv("PORT")); err != nil {
