@@ -22,6 +22,10 @@ DELETE  /api/subjects/:id
 
 GET     /api/subject_types
 POST    /api/subject_types
+
+GET     /api/student_subjects
+GET     /api/student_subjects/students/:student_id/subjects/:subject_id
+POST    /api/student_subjects
 ```
 
 Sample `.env`

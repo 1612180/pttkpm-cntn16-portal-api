@@ -9,6 +9,7 @@ type Services interface {
 		*FacultyService,
 		*SubjectService,
 		*SubjectTypeService,
+		*StudentSubjectService,
 	)
 }
 
@@ -19,6 +20,7 @@ type MyServices struct {
 	repositories.FacultyRepo
 	repositories.SubjectRepo
 	repositories.SubjectTypeRepo
+	repositories.StudentSubjectRepo
 }
 
 func NewMyServices(
@@ -28,14 +30,16 @@ func NewMyServices(
 	facultyRepo repositories.FacultyRepo,
 	subjectRepo repositories.SubjectRepo,
 	subjectTypeRepo repositories.SubjectTypeRepo,
+	studentSubjectRepo repositories.StudentSubjectRepo,
 ) Services {
 	return &MyServices{
-		StudentRepo:     studentRepo,
-		AccountRepo:     accountRepo,
-		ProgramRepo:     programRepo,
-		FacultyRepo:     facultyRepo,
-		SubjectRepo:     subjectRepo,
-		SubjectTypeRepo: subjectTypeRepo,
+		StudentRepo:        studentRepo,
+		AccountRepo:        accountRepo,
+		ProgramRepo:        programRepo,
+		FacultyRepo:        facultyRepo,
+		SubjectRepo:        subjectRepo,
+		SubjectTypeRepo:    subjectTypeRepo,
+		StudentSubjectRepo: studentSubjectRepo,
 	}
 }
 
@@ -45,6 +49,7 @@ func (s *MyServices) CreateAll() (
 	*FacultyService,
 	*SubjectService,
 	*SubjectTypeService,
+	*StudentSubjectService,
 ) {
 	return &StudentService{
 			StudentRepo: s.StudentRepo,
@@ -66,5 +71,8 @@ func (s *MyServices) CreateAll() (
 		},
 		&SubjectTypeService{
 			SubjectTypeRepo: s.SubjectTypeRepo,
+		},
+		&StudentSubjectService{
+			StudentSubjectRepo: s.StudentSubjectRepo,
 		}
 }

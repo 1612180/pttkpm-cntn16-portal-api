@@ -9,6 +9,7 @@ type Handlers interface {
 		*FacultyHandler,
 		*SubjectHandler,
 		*SubjectTypeHandler,
+		*StudentSubjectHandler,
 	)
 }
 
@@ -18,6 +19,7 @@ type MyHandlers struct {
 	*services.FacultyService
 	*services.SubjectService
 	*services.SubjectTypeService
+	*services.StudentSubjectService
 }
 
 func NewMyHandlers(studentService *services.StudentService,
@@ -25,13 +27,15 @@ func NewMyHandlers(studentService *services.StudentService,
 	facultyService *services.FacultyService,
 	subjectService *services.SubjectService,
 	subjectTypeService *services.SubjectTypeService,
+	studentSubjectService *services.StudentSubjectService,
 ) Handlers {
 	return &MyHandlers{
-		StudentService:     studentService,
-		ProgramService:     programService,
-		FacultyService:     facultyService,
-		SubjectService:     subjectService,
-		SubjectTypeService: subjectTypeService,
+		StudentService:        studentService,
+		ProgramService:        programService,
+		FacultyService:        facultyService,
+		SubjectService:        subjectService,
+		SubjectTypeService:    subjectTypeService,
+		StudentSubjectService: studentSubjectService,
 	}
 }
 
@@ -41,6 +45,7 @@ func (h *MyHandlers) CreateAll() (
 	*FacultyHandler,
 	*SubjectHandler,
 	*SubjectTypeHandler,
+	*StudentSubjectHandler,
 ) {
 	return &StudentHandler{
 			StudentService: h.StudentService,
@@ -56,5 +61,8 @@ func (h *MyHandlers) CreateAll() (
 		},
 		&SubjectTypeHandler{
 			SubjectTypeService: h.SubjectTypeService,
+		},
+		&StudentSubjectHandler{
+			StudentSubjectService: h.StudentSubjectService,
 		}
 }

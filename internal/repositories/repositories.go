@@ -60,6 +60,12 @@ type FacultyRepo interface {
 	DeleteByShort(short string) bool
 }
 
+type StudentSubjectRepo interface {
+	FetchAll() ([]*models.StudentSubject, bool)
+	FindByID(studentID, subjectID int) (*models.StudentSubject, bool)
+	Create(studentSubject *models.StudentSubject) bool
+}
+
 type Repos interface {
 	CreateAll() (
 		StudentRepo,
@@ -68,6 +74,7 @@ type Repos interface {
 		FacultyRepo,
 		SubjectRepo,
 		SubjectTypeRepo,
+		StudentSubjectRepo,
 	)
 }
 
@@ -86,6 +93,7 @@ func (r *ReposGorm) CreateAll() (
 	FacultyRepo,
 	SubjectRepo,
 	SubjectTypeRepo,
+	StudentSubjectRepo,
 ) {
 	if os.Getenv("DATABASE_MODE") == "debug" {
 		r.DB.DropTableIfExists(&models.Account{})
@@ -114,5 +122,6 @@ func (r *ReposGorm) CreateAll() (
 		&ProgramGorm{DB: r.DB},
 		&FacultyGorm{DB: r.DB},
 		&SubjectGorm{DB: r.DB},
-		&SubjectTypeGorm{DB: r.DB}
+		&SubjectTypeGorm{DB: r.DB},
+		&StudentSubjectGorm{DB: r.DB}
 }
