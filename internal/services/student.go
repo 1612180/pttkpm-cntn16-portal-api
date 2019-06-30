@@ -109,11 +109,8 @@ func (s *StudentService) Create(request *dtos.StudentRequest) bool {
 	return true
 }
 
-func (s *StudentService) Delete(mssv string) bool {
-	if ok := s.StudentRepo.DeleteByMSSV(mssv); !ok {
-		return false
-	}
-	return true
+func (s *StudentService) DeleteByMSSV(mssv string) bool {
+	return s.StudentRepo.DeleteByMSSV(mssv)
 }
 
 func (s *StudentService) Validate(request *dtos.StudentRequest) bool {

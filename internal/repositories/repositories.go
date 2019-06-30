@@ -61,7 +61,13 @@ type FacultyRepo interface {
 }
 
 type Repos interface {
-	CreateAll() (StudentRepo, AccountRepo, ProgramRepo, FacultyRepo)
+	CreateAll() (
+		StudentRepo,
+		AccountRepo,
+		ProgramRepo,
+		FacultyRepo,
+		SubjectRepo,
+	)
 }
 
 type ReposGorm struct {
@@ -72,7 +78,13 @@ func NewReposGorm(db *gorm.DB) Repos {
 	return &ReposGorm{DB: db}
 }
 
-func (r *ReposGorm) CreateAll() (StudentRepo, AccountRepo, ProgramRepo, FacultyRepo) {
+func (r *ReposGorm) CreateAll() (
+	StudentRepo,
+	AccountRepo,
+	ProgramRepo,
+	FacultyRepo,
+	SubjectRepo,
+) {
 	if os.Getenv("DATABASE_MODE") == "debug" {
 		r.DB.DropTableIfExists(&models.Account{})
 		r.DB.DropTableIfExists(&models.Student{})
@@ -98,5 +110,6 @@ func (r *ReposGorm) CreateAll() (StudentRepo, AccountRepo, ProgramRepo, FacultyR
 	return &StudentGorm{DB: r.DB},
 		&AccountGorm{DB: r.DB},
 		&ProgramGorm{DB: r.DB},
-		&FacultyGorm{DB: r.DB}
+		&FacultyGorm{DB: r.DB},
+		&SubjectGorm{DB: r.DB}
 }

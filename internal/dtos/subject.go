@@ -9,6 +9,9 @@ type SubjectRequest struct {
 	Year             int    `json:"year"`
 	Semester         int    `json:"semester"`
 	Status           bool   `json:"status"`
+	Weekday          int    `json:"weekday"`
+	FromPeriod       int    `json:"from_period"`
+	ToPeriod         int    `json:"to_period"`
 	ProgramShort     string `json:"program_short"`
 	FacultyShort     string `json:"faculty_short"`
 	SubjectTypeShort string `json:"subject_type_short"`
@@ -24,6 +27,9 @@ type SubjectResponse struct {
 	Year             int    `json:"year"`
 	Semester         int    `json:"semester"`
 	Status           bool   `json:"status"`
+	Weekday          int    `json:"weekday"`
+	FromPeriod       int    `json:"from_period"`
+	ToPeriod         int    `json:"to_period"`
 	ProgramShort     string `json:"program_short"`
 	ProgramLong      string `json:"program_long"`
 	FacultyShort     string `json:"faculty_short"`

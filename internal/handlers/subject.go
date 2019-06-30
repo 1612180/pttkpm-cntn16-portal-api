@@ -10,12 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type StudentHandler struct {
-	*services.StudentService
+type SubjectHandler struct {
+	*services.SubjectService
 }
 
-func (h *StudentHandler) FetchAll(c *gin.Context) {
-	responses, ok := h.StudentService.FetchAll()
+func (h *SubjectHandler) FetchAll(c *gin.Context) {
+	responses, ok := h.SubjectService.FetchAll()
 	if !ok {
 		c.JSON(200, message.Create(false))
 		return
@@ -26,7 +26,7 @@ func (h *StudentHandler) FetchAll(c *gin.Context) {
 	c.JSON(200, msg)
 }
 
-func (h *StudentHandler) FindByID(c *gin.Context) {
+func (h *SubjectHandler) FindByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println(err)
@@ -34,7 +34,7 @@ func (h *StudentHandler) FindByID(c *gin.Context) {
 		return
 	}
 
-	response, ok := h.StudentService.FindByID(id)
+	response, ok := h.SubjectService.FindByID(id)
 	if !ok {
 		c.JSON(200, message.Create(false))
 		return
@@ -45,9 +45,9 @@ func (h *StudentHandler) FindByID(c *gin.Context) {
 	c.JSON(200, msg)
 }
 
-func (h *StudentHandler) Create(c *gin.Context) {
+func (h *SubjectHandler) Create(c *gin.Context) {
 	// get json from client
-	var request dtos.StudentRequest
+	var request dtos.SubjectRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
@@ -55,7 +55,7 @@ func (h *StudentHandler) Create(c *gin.Context) {
 	}
 
 	// create by service
-	if ok := h.StudentService.Create(&request); !ok {
+	if ok := h.SubjectService.Create(&request); !ok {
 		c.JSON(200, message.Create(false))
 		return
 	}
@@ -63,25 +63,15 @@ func (h *StudentHandler) Create(c *gin.Context) {
 	c.JSON(200, message.Create(true))
 }
 
-func (h *StudentHandler) DeleteByMSSV(c *gin.Context) {
-	if ok := h.StudentService.DeleteByMSSV(c.Param("mssv")); !ok {
-		c.JSON(200, message.Create(false))
-		return
-	}
-
-	c.JSON(200, message.Create(true))
-}
-
-func (h *StudentHandler) Login(c *gin.Context) {
-	// get json from client
-	var request dtos.StudentRequest
-	if err := c.ShouldBindJSON(&request); err != nil {
+func (h *SubjectHandler) DeleteByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
 		log.Println(err)
 		c.JSON(200, message.Create(false))
 		return
 	}
 
-	if ok := h.StudentService.Validate(&request); !ok {
+	if ok := h.SubjectService.DeleteByID(id); !ok {
 		c.JSON(200, message.Create(false))
 		return
 	}

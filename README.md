@@ -5,8 +5,20 @@ API endpoints
 GET     /api/students
 GET     /api/students/:id
 POST    /api/students
+DELETE  /api/students/:mssv
 
 POST    /api/auth/login
+
+GET     /api/programs
+POST    /api/programs
+
+GET     /api/faculties
+POST    /api/faculties
+
+GET     /api/subjects
+GET     /api/subjects/:id
+POST    /api/subjects
+DELETE  /api/subjects/:id
 ```
 
 Sample `.env`

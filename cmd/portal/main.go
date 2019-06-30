@@ -36,15 +36,36 @@ func main() {
 
 	// Create repo
 	reposInterface := repositories.NewReposGorm(db)
-	studentRepo, accountRepo, programRepo, facultyRepo := reposInterface.CreateAll()
+	studentRepo,
+		accountRepo,
+		programRepo,
+		facultyRepo,
+		subjectRepo := reposInterface.CreateAll()
 
 	// Create service
-	servicesInterface := services.NewMyServices(studentRepo, accountRepo, programRepo, facultyRepo)
-	studentService, programService, facultyService := servicesInterface.CreateAll()
+	servicesInterface := services.NewMyServices(
+		studentRepo,
+		accountRepo,
+		programRepo,
+		facultyRepo,
+		subjectRepo,
+	)
+	studentService,
+		programService,
+		facultyService,
+		subjectService := servicesInterface.CreateAll()
 
 	// Create handler
-	handlersInterface := handlers.NewMyHandlers(studentService, programService, facultyService)
-	studentHandler, programHandler, facultyHandler := handlersInterface.CreateAll()
+	handlersInterface := handlers.NewMyHandlers(
+		studentService,
+		programService,
+		facultyService,
+		subjectService,
+	)
+	studentHandler,
+		programHandler,
+		facultyHandler,
+		subjectHandler := handlersInterface.CreateAll()
 
 	// Set gin mode
 	gin.SetMode(os.Getenv("GIN_MODE"))
@@ -63,7 +84,7 @@ func main() {
 			studentAPI.GET("", studentHandler.FetchAll)
 			studentAPI.GET("/:id", studentHandler.FindByID)
 			studentAPI.POST("", studentHandler.Create)
-			studentAPI.DELETE("/:mssv", studentHandler.Delete)
+			studentAPI.DELETE("/:mssv", studentHandler.DeleteByMSSV)
 		}
 
 		authAPI := api.Group("/auth")
@@ -81,6 +102,14 @@ func main() {
 		{
 			facultyAPI.GET("", facultyHandler.FetchAll)
 			facultyAPI.POST("", facultyHandler.Create)
+		}
+
+		subjectAPI := api.Group("/subjects")
+		{
+			subjectAPI.GET("", subjectHandler.FetchAll)
+			subjectAPI.GET("/:id", subjectHandler.FindByID)
+			subjectAPI.POST("", subjectHandler.Create)
+			subjectAPI.DELETE("/:id", subjectHandler.DeleteByID)
 		}
 	}
 
