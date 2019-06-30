@@ -1,7 +1,7 @@
 package dtos
 
 type SubjectRequest struct {
-	MaHocPhan        string `json:"mahocphan"`
+	MaHocPhan        string `json:"ma_hoc_phan"`
 	Name             string `json:"name"`
 	Class            string `json:"class"`
 	Value            int    `json:"value"`
@@ -19,7 +19,7 @@ type SubjectRequest struct {
 
 type SubjectResponse struct {
 	ID               int    `json:"id"`
-	MaHocPhan        string `json:"mahocphan"`
+	MaHocPhan        string `json:"ma_hoc_phan"`
 	Name             string `json:"name"`
 	Class            string `json:"class"`
 	Value            int    `json:"value"`
