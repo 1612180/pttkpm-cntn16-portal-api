@@ -63,7 +63,6 @@ func (e *EnrollGorm) TryEnrolls() ([]*TryEnroll, bool) {
 	return tryEnrolls, true
 }
 
-// TODO dieu kien
 func (e *EnrollGorm) Save(enroll *Enroll) bool {
 	tx := e.DB.Begin()
 
@@ -92,7 +91,6 @@ func (e *EnrollGorm) Save(enroll *Enroll) bool {
 	return true
 }
 
-// TODO dieu kien
 func (e *EnrollGorm) SaveTry(tryEnroll *TryEnroll) bool {
 	tx := e.DB.Begin()
 
@@ -135,6 +133,21 @@ func (e *EnrollGorm) SaveReal(tryEnroll *TryEnroll) bool {
 
 	// auto create score with default 0
 	if err := tx.Create(&Score{EnrollID: enroll.ID}).Error; err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return false
+	}
+
+	// change subject status to false
+	var subject Subject
+	if err := tx.Where("id = ?", enroll.SubjectID).First(&subject).Error; err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return false
+	}
+
+	subject.Status = false
+	if err := tx.Save(&subject).Error; err != nil {
 		log.Println(err)
 		tx.Rollback()
 		return false

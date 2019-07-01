@@ -82,8 +82,8 @@ func (s *SubjectGorm) CanTryEnroll(studentID int) ([]*Subject, bool) {
 
 	// find subject in program, faculty
 	var subjects []*Subject
-	if err := s.DB.Where("program_id = ? AND faculty_id = ?", student.ProgramID, student.FacultyID).
-		Or("can_enroll = ? AND faculty_id = ?", 1, student.FacultyID).
+	if err := s.DB.Where("program_id = ? AND faculty_id = ? AND status = ?", student.ProgramID, student.FacultyID, true).
+		Or("can_enroll = ? AND faculty_id = ? AND status = ?", 1, student.FacultyID, true).
 		Find(&subjects).Error; err != nil {
 		log.Println(err)
 		return nil, false
@@ -138,8 +138,8 @@ func (s *SubjectGorm) NotTryEnroll(studentID int) ([]*Subject, bool) {
 
 	// find subject in program, faculty
 	var subjects []*Subject
-	if err := s.DB.Where("program_id = ? AND faculty_id = ?", student.ProgramID, student.FacultyID).
-		Or("can_enroll = ? AND faculty_id = ?", 1, student.FacultyID).
+	if err := s.DB.Where("program_id = ? AND faculty_id = ? AND status = ?", student.ProgramID, student.FacultyID, true).
+		Or("can_enroll = ? AND faculty_id = ? AND status = ?", 1, student.FacultyID, true).
 		Find(&subjects).Error; err != nil {
 		log.Println(err)
 		return nil, false
