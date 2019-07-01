@@ -22,6 +22,27 @@ func (s *StudentTransport) StudentByMSSV(c *gin.Context) {
 	c.JSON(200, message.CreateWithData(true, studentMore))
 }
 
+func (s *StudentTransport) TryEnroll(c *gin.Context) {
+	if c.Param("status") == "already" {
+		studentMore, ok := s.StudentService.AlreadyTryEnroll(c.Param("mssv"))
+		if !ok {
+			c.JSON(200, message.Create(false))
+			return
+		}
+		c.JSON(200, message.CreateWithData(true, studentMore))
+		return
+	} else if c.Param("status") == "can" {
+		studentMore, ok := s.StudentService.CanTryEnroll(c.Param("mssv"))
+		if !ok {
+			c.JSON(200, message.Create(false))
+			return
+		}
+		c.JSON(200, message.CreateWithData(true, studentMore))
+		return
+	}
+	c.JSON(200, message.Create(false))
+}
+
 func (s *StudentTransport) Save(c *gin.Context) {
 	var student storage.Student
 	if err := c.ShouldBindJSON(&student); err != nil {

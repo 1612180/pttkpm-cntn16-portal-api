@@ -12,7 +12,7 @@ type EnrollTransport struct {
 	*service.EnrollService
 }
 
-func (e *EnrollTransport) Save(c *gin.Context) {
+func (e *EnrollTransport) SaveMulti(c *gin.Context) {
 	var multiEnroll service.MultiEnroll
 	if err := c.ShouldBindJSON(&multiEnroll); err != nil {
 		log.Println(err)
@@ -20,7 +20,45 @@ func (e *EnrollTransport) Save(c *gin.Context) {
 		return
 	}
 
-	if ok := e.EnrollService.Save(&multiEnroll); !ok {
+	if ok := e.EnrollService.SaveMulti(&multiEnroll); !ok {
+		c.JSON(200, message.Create(false))
+		return
+	}
+	c.JSON(200, message.Create(true))
+}
+
+func (e *EnrollTransport) SaveTryMulti(c *gin.Context) {
+	var multiEnroll service.MultiEnroll
+	if err := c.ShouldBindJSON(&multiEnroll); err != nil {
+		log.Println(err)
+		c.JSON(200, message.Create(false))
+		return
+	}
+
+	if ok := e.EnrollService.SaveTryMulti(&multiEnroll); !ok {
+		c.JSON(200, message.Create(false))
+		return
+	}
+	c.JSON(200, message.Create(true))
+}
+
+func (e *EnrollTransport) SaveRealAll(c *gin.Context) {
+	if ok := e.EnrollService.SaveRealAll(); !ok {
+		c.JSON(200, message.Create(false))
+		return
+	}
+	c.JSON(200, message.Create(true))
+}
+
+func (e *EnrollTransport) DeleteTryMulti(c *gin.Context) {
+	var multiEnroll service.MultiEnroll
+	if err := c.ShouldBindJSON(&multiEnroll); err != nil {
+		log.Println(err)
+		c.JSON(200, message.Create(false))
+		return
+	}
+
+	if ok := e.EnrollService.DeleteTryMulti(&multiEnroll); !ok {
 		c.JSON(200, message.Create(false))
 		return
 	}

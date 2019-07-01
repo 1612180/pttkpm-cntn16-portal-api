@@ -38,7 +38,7 @@ func (s *StudentService) StudentByMSSV(mssv string) (*StudentMore, bool) {
 	studentMore.Student = student
 
 	// fill results
-	enrolls, ok := s.EnrollStorage.Enrolls(student.ID)
+	enrolls, ok := s.EnrollStorage.EnrollsByStudentID(student.ID)
 	if !ok {
 		return &studentMore, true
 	}
@@ -59,6 +59,66 @@ func (s *StudentService) StudentByMSSV(mssv string) (*StudentMore, bool) {
 	}
 	studentMore.Results = results
 	return &studentMore, true
+}
+
+func (s *StudentService) AlreadyTryEnroll(mssv string) (*StudentMore, bool) {
+	student, ok := s.StudentStorage.StudentByMSSV(mssv)
+	if !ok {
+		return nil, false
+	}
+	storage.FillStudent(student, s.ProgramStorage, s.FacultyStorage)
+
+	var studentMore StudentMore
+	studentMore.Student = student
+
+	// fill results
+	tryEnrolls, ok := s.EnrollStorage.TryEnrollsByStudentID(student.ID)
+	if !ok {
+		return &studentMore, true
+	}
+
+	var results []*Result
+	for _, tryEnroll := range tryEnrolls {
+		subject, ok := s.SubjectStorage.Subject(tryEnroll.SubjectID)
+		if !ok {
+			continue
+		}
+		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+
+		results = append(results, &Result{Subject: subject})
+	}
+	studentMore.Results = results
+	return &studentMore, true
+}
+
+func (s *StudentService) CanTryEnroll(mssv string) (*StudentMore, bool) {
+	student, ok := s.StudentStorage.StudentByMSSV(mssv)
+	if !ok {
+		return nil, false
+	}
+	storage.FillStudent(student, s.ProgramStorage, s.FacultyStorage)
+
+	var studentMore StudentMore
+	studentMore.Student = student
+
+	// fill results
+	canSubjects, ok := s.SubjectStorage.CanEnroll(student.ID)
+	if !ok {
+		return &studentMore, true
+	}
+
+	var results []*Result
+	for _, subject := range canSubjects {
+		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+
+		results = append(results, &Result{Subject: subject})
+	}
+	studentMore.Results = results
+	return &studentMore, true
+}
+
+func (s *StudentService) NotTryEnroll() {
+
 }
 
 func (s *StudentService) Save(student *storage.Student) bool {

@@ -12,10 +12,11 @@ type Account struct {
 }
 
 type Student struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	MSSV string `json:"mssv"`
-	Year int    `json:"year"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	MSSV     string `json:"mssv"`
+	Year     int    `json:"year"`
+	MaxValue int    `json:"max_value"`
 
 	Password  string `gorm:"-" json:"password"`
 	AccountID int    `json:"-"`

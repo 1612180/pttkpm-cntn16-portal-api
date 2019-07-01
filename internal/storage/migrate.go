@@ -19,6 +19,7 @@ func MigrateAll(db *gorm.DB) {
 
 		db.DropTableIfExists(&Enroll{})
 		db.DropTableIfExists(&Score{})
+		db.DropTableIfExists(&TryEnroll{})
 	}
 
 	db.AutoMigrate(&Account{})
@@ -32,4 +33,10 @@ func MigrateAll(db *gorm.DB) {
 
 	db.AutoMigrate(&Enroll{})
 	db.AutoMigrate(&Score{})
+	db.AutoMigrate(&TryEnroll{})
+
+	db.Create(&Program{Short: "cntn", Long: "Cử nhân tài năng"})
+	db.Create(&Program{Short: "cq", Long: "Chính quy"})
+	db.Create(&Faculty{Short: "cntt", Long: "Công nghệ thông tin"})
+	db.Create(&TypeSub{Short: "bb", Long: "bắt buộc"})
 }

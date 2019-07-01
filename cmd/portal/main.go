@@ -93,7 +93,11 @@ func main() {
 	route.POST("/subjects", subjectTransport.Save)
 	route.POST("/type_subs", typeSubTransport.Save)
 
-	route.POST("/enrolls", enrollTransport.Save)
+	route.GET("/students/:mssv/try_enrolls/:status", studentTransport.TryEnroll)
+	route.POST("/try_enrolls", enrollTransport.SaveTryMulti)
+	route.POST("/try_enrolls/delete", enrollTransport.DeleteTryMulti)
+	route.POST("/real_enrolls", enrollTransport.SaveRealAll)
+	route.POST("/enrolls", enrollTransport.SaveMulti)
 	route.POST("/scores", scoreTransport.Save)
 
 	// Run gin
