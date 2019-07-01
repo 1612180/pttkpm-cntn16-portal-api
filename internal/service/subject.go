@@ -15,11 +15,11 @@ func (s *SubjectService) Subject(id int) (*storage.Subject, bool) {
 		return nil, false
 	}
 
-	storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+	storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.SubjectStorage, s.TypeSubStorage)
 	return subject, true
 }
 
 func (s *SubjectService) Save(subject *storage.Subject) bool {
-	storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+	storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.SubjectStorage, s.TypeSubStorage)
 	return s.SubjectStorage.Save(subject)
 }

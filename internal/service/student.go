@@ -49,7 +49,7 @@ func (s *StudentService) StudentByMSSV(mssv string) (*StudentMore, bool) {
 		if !ok {
 			continue
 		}
-		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.SubjectStorage, s.TypeSubStorage)
 
 		score, ok := s.ScoreStorage.ScoreByEnrollID(enroll.ID)
 		if !ok {
@@ -83,7 +83,7 @@ func (s *StudentService) AlreadyTryEnroll(mssv string) (*StudentMore, bool) {
 		if !ok {
 			continue
 		}
-		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.SubjectStorage, s.TypeSubStorage)
 
 		results = append(results, &Result{Subject: subject})
 	}
@@ -102,14 +102,14 @@ func (s *StudentService) CanTryEnroll(mssv string) (*StudentMore, bool) {
 	studentMore.Student = student
 
 	// fill results
-	canSubjects, ok := s.SubjectStorage.CanEnroll(student.ID)
+	canSubjects, ok := s.SubjectStorage.CanTryEnroll(student.ID)
 	if !ok {
 		return &studentMore, true
 	}
 
 	var results []*Result
 	for _, subject := range canSubjects {
-		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.SubjectStorage, s.TypeSubStorage)
 
 		results = append(results, &Result{Subject: subject})
 	}
@@ -128,14 +128,14 @@ func (s *StudentService) NotTryEnroll(mssv string) (*StudentMore, bool) {
 	studentMore.Student = student
 
 	// fill results
-	notSubjects, ok := s.SubjectStorage.NotEnroll(student.ID)
+	notSubjects, ok := s.SubjectStorage.NotTryEnroll(student.ID)
 	if !ok {
 		return &studentMore, true
 	}
 
 	var results []*Result
 	for _, subject := range notSubjects {
-		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.SubjectStorage, s.TypeSubStorage)
 
 		results = append(results, &Result{Subject: subject})
 	}

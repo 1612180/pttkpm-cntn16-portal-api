@@ -56,7 +56,7 @@ func (e *EnrollGorm) TryEnrollsByStudentID(studentID int) ([]*TryEnroll, bool) {
 
 func (e *EnrollGorm) TryEnrolls() ([]*TryEnroll, bool) {
 	var tryEnrolls []*TryEnroll
-	if err := e.DB.First(&tryEnrolls).Error; err != nil {
+	if err := e.DB.Find(&tryEnrolls).Error; err != nil {
 		log.Println(err)
 		return nil, false
 	}

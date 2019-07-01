@@ -7,13 +7,14 @@ import (
 )
 
 type Subject struct {
-	ID         int    `json:"id"`
-	Name       string `json:"name"`
-	MHP        string `json:"mhp"`
-	Class      string `json:"class"`
-	Value      int    `json:"value"`
-	MaxStudent int    `json:"max_student"`
-	Status     bool   `json:"status"`
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	MHP          string `json:"mhp"`
+	Class        string `json:"class"`
+	Value        int    `json:"value"`
+	MaxStudent   int    `json:"max_student"`
+	CountStudent int    `gorm:"-" json:"count_student"`
+	Status       bool   `json:"status"`
 
 	Year       int `json:"year"`
 	Semester   int `json:"semester"`
@@ -41,8 +42,9 @@ type Subject struct {
 type SubjectStorage interface {
 	Subject(id int) (*Subject, bool)
 	Save(subject *Subject) bool
-	CanEnroll(studentID int) ([]*Subject, bool)
-	NotEnroll(studentID int) ([]*Subject, bool)
+	CanTryEnroll(studentID int) ([]*Subject, bool)
+	NotTryEnroll(studentID int) ([]*Subject, bool)
+	CountTryEnroll(subjectID int) int
 }
 
 type SubjectGorm struct {
@@ -70,7 +72,7 @@ func (s *SubjectGorm) Save(subject *Subject) bool {
 	return true
 }
 
-func (s *SubjectGorm) CanEnroll(studentID int) ([]*Subject, bool) {
+func (s *SubjectGorm) CanTryEnroll(studentID int) ([]*Subject, bool) {
 	// find student
 	var student Student
 	if err := s.DB.Where("id = ?", studentID).First(&student).Error; err != nil {
@@ -83,6 +85,7 @@ func (s *SubjectGorm) CanEnroll(studentID int) ([]*Subject, bool) {
 	if err := s.DB.Where("program_id = ? AND faculty_id = ?", student.ProgramID, student.FacultyID).
 		Or("can_enroll = ? AND faculty_id = ?", 1, student.FacultyID).
 		Find(&subjects).Error; err != nil {
+		log.Println(err)
 		return nil, false
 	}
 
@@ -125,7 +128,7 @@ func (s *SubjectGorm) CanEnroll(studentID int) ([]*Subject, bool) {
 	return canSubjects, true
 }
 
-func (s *SubjectGorm) NotEnroll(studentID int) ([]*Subject, bool) {
+func (s *SubjectGorm) NotTryEnroll(studentID int) ([]*Subject, bool) {
 	// find student
 	var student Student
 	if err := s.DB.Where("id = ?", studentID).First(&student).Error; err != nil {
@@ -138,6 +141,7 @@ func (s *SubjectGorm) NotEnroll(studentID int) ([]*Subject, bool) {
 	if err := s.DB.Where("program_id = ? AND faculty_id = ?", student.ProgramID, student.FacultyID).
 		Or("can_enroll = ? AND faculty_id = ?", 1, student.FacultyID).
 		Find(&subjects).Error; err != nil {
+		log.Println(err)
 		return nil, false
 	}
 
@@ -163,19 +167,25 @@ func (s *SubjectGorm) NotEnroll(studentID int) ([]*Subject, bool) {
 			continue
 		}
 
-		// chua vuot qua so tin chi toi da cua sinh vien
-		if value+subject.Value <= student.MaxValue {
+		// khong duoc vuot qua so tin chi toi da cua sinh vien
+		if value+subject.Value > student.MaxValue {
+			notSubjects = append(notSubjects, subject)
 			continue
 		}
 
-		// mon hoc chua full
+		// kiem tra mon hoc da full chua
 		var count int
 		s.DB.Model(&TryEnroll{}).Where("subject_id = ?", subject.ID).Count(&count)
-		if count+1 <= subject.MaxStudent {
+		if count+1 > subject.MaxStudent {
+			notSubjects = append(notSubjects, subject)
 			continue
 		}
-
-		notSubjects = append(notSubjects, subject)
 	}
 	return notSubjects, true
+}
+
+func (s *SubjectGorm) CountTryEnroll(subjectID int) int {
+	count := 0
+	s.DB.Model(&TryEnroll{}).Where("subject_id = ?", subjectID).Count(&count)
+	return count
 }

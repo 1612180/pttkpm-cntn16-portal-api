@@ -32,7 +32,8 @@ func FillStudent(student *Student,
 }
 
 func FillSubject(subject *Subject,
-	programStorage ProgramStorage, facultyStorage FacultyStorage, typeSubStorage TypeSubStorage) {
+	programStorage ProgramStorage, facultyStorage FacultyStorage,
+	subjectStorage SubjectStorage, typeSubStorage TypeSubStorage) {
 	if subject == nil {
 		return
 	}
@@ -72,4 +73,6 @@ func FillSubject(subject *Subject,
 			subject.TypeSubLong = typeSub.Long
 		}
 	}
+
+	subject.CountStudent = subjectStorage.CountTryEnroll(subject.ID)
 }
