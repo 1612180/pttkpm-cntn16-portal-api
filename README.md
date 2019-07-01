@@ -14,6 +14,10 @@ GET     /subjects/:id
 POST    /subjects
 POST    /type_subs
 
+GET     /students/:mssv/try_enrolls/:status
+POST    /try_enrolls
+POST    /try_enrolls/delete
+POST    /real_enrolls
 POST    /enrolls
 POST    /scores
 ```

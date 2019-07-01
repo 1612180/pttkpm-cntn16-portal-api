@@ -39,6 +39,14 @@ func (s *StudentTransport) TryEnroll(c *gin.Context) {
 		}
 		c.JSON(200, message.CreateWithData(true, studentMore))
 		return
+	} else if c.Param("status") == "not" {
+		studentMore, ok := s.StudentService.NotTryEnroll(c.Param("mssv"))
+		if !ok {
+			c.JSON(200, message.Create(false))
+			return
+		}
+		c.JSON(200, message.CreateWithData(true, studentMore))
+		return
 	}
 	c.JSON(200, message.Create(false))
 }

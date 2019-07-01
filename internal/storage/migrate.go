@@ -16,6 +16,7 @@ func MigrateAll(db *gorm.DB) {
 
 		db.DropTableIfExists(&Subject{})
 		db.DropTableIfExists(&TypeSub{})
+		db.DropTableIfExists(&RequireSub{})
 
 		db.DropTableIfExists(&Enroll{})
 		db.DropTableIfExists(&Score{})
@@ -30,6 +31,7 @@ func MigrateAll(db *gorm.DB) {
 
 	db.AutoMigrate(&Subject{})
 	db.AutoMigrate(&TypeSub{})
+	db.AutoMigrate(&RequireSub{})
 
 	db.AutoMigrate(&Enroll{})
 	db.AutoMigrate(&Score{})
@@ -38,5 +40,7 @@ func MigrateAll(db *gorm.DB) {
 	db.Create(&Program{Short: "cntn", Long: "Cử nhân tài năng"})
 	db.Create(&Program{Short: "cq", Long: "Chính quy"})
 	db.Create(&Faculty{Short: "cntt", Long: "Công nghệ thông tin"})
-	db.Create(&TypeSub{Short: "bb", Long: "bắt buộc"})
+	db.Create(&Faculty{Short: "sh", Long: "Sinh học"})
+	db.Create(&TypeSub{Short: "bb", Long: "Bắt buộc"})
+	db.Create(&TypeSub{Short: "tc", Long: "Tự chọn"})
 }

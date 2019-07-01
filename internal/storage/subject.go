@@ -42,6 +42,7 @@ type SubjectStorage interface {
 	Subject(id int) (*Subject, bool)
 	Save(subject *Subject) bool
 	CanEnroll(studentID int) ([]*Subject, bool)
+	NotEnroll(studentID int) ([]*Subject, bool)
 }
 
 type SubjectGorm struct {
@@ -79,26 +80,34 @@ func (s *SubjectGorm) CanEnroll(studentID int) ([]*Subject, bool) {
 
 	// find subject in program, faculty
 	var subjects []*Subject
-	s.DB.Where("program_id = ? AND faculty_id = ?", student.ProgramID, student.FacultyID).
+	if err := s.DB.Where("program_id = ? AND faculty_id = ?", student.ProgramID, student.FacultyID).
 		Or("can_enroll = ? AND faculty_id = ?", 1, student.FacultyID).
-		Find(&subjects)
+		Find(&subjects).Error; err != nil {
+		return nil, false
+	}
 
 	// count value in try enroll
 	var tryEnrolls []*TryEnroll
-	s.DB.Where("student_id = ?", student.ID).Find(&tryEnrolls)
-
 	value := 0
-	for _, tryEnroll := range tryEnrolls {
-		var subject Subject
-		if err := s.DB.Where("id = ?", tryEnroll.SubjectID).First(&subject); err != nil {
-			log.Println(err)
-			continue
+	if err := s.DB.Where("student_id = ?", student.ID).Find(&tryEnrolls).Error; err == nil {
+		for _, tryEnroll := range tryEnrolls {
+			var subject Subject
+			if err := s.DB.Where("id = ?", tryEnroll.SubjectID).First(&subject).Error; err != nil {
+				log.Println(err)
+				continue
+			}
+			value += subject.Value
 		}
-		value += subject.Value
 	}
 
 	var canSubjects []*Subject
 	for _, subject := range subjects {
+		// khong duoc ton tai trong try enroll
+		if !s.DB.Where("student_id = ? AND subject_id = ?", student.ID, subject.ID).
+			First(&TryEnroll{}).RecordNotFound() {
+			continue
+		}
+
 		// khong duoc vuot qua so tin chi toi da cua sinh vien
 		if value+subject.Value > student.MaxValue {
 			continue
@@ -114,4 +123,59 @@ func (s *SubjectGorm) CanEnroll(studentID int) ([]*Subject, bool) {
 		canSubjects = append(canSubjects, subject)
 	}
 	return canSubjects, true
+}
+
+func (s *SubjectGorm) NotEnroll(studentID int) ([]*Subject, bool) {
+	// find student
+	var student Student
+	if err := s.DB.Where("id = ?", studentID).First(&student).Error; err != nil {
+		log.Println(err)
+		return nil, false
+	}
+
+	// find subject in program, faculty
+	var subjects []*Subject
+	if err := s.DB.Where("program_id = ? AND faculty_id = ?", student.ProgramID, student.FacultyID).
+		Or("can_enroll = ? AND faculty_id = ?", 1, student.FacultyID).
+		Find(&subjects).Error; err != nil {
+		return nil, false
+	}
+
+	// count value in try enroll
+	var tryEnrolls []*TryEnroll
+	value := 0
+	if err := s.DB.Where("student_id = ?", student.ID).Find(&tryEnrolls).Error; err == nil {
+		for _, tryEnroll := range tryEnrolls {
+			var subject Subject
+			if err := s.DB.Where("id = ?", tryEnroll.SubjectID).First(&subject).Error; err != nil {
+				log.Println(err)
+				continue
+			}
+			value += subject.Value
+		}
+	}
+
+	var notSubjects []*Subject
+	for _, subject := range subjects {
+		// khong duoc ton tai trong try enroll
+		if !s.DB.Where("student_id = ? AND subject_id = ?", student.ID, subject.ID).
+			First(&TryEnroll{}).RecordNotFound() {
+			continue
+		}
+
+		// chua vuot qua so tin chi toi da cua sinh vien
+		if value+subject.Value <= student.MaxValue {
+			continue
+		}
+
+		// mon hoc chua full
+		var count int
+		s.DB.Model(&TryEnroll{}).Where("subject_id = ?", subject.ID).Count(&count)
+		if count+1 <= subject.MaxStudent {
+			continue
+		}
+
+		notSubjects = append(notSubjects, subject)
+	}
+	return notSubjects, true
 }

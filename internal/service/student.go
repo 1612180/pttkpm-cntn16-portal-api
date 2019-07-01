@@ -117,8 +117,30 @@ func (s *StudentService) CanTryEnroll(mssv string) (*StudentMore, bool) {
 	return &studentMore, true
 }
 
-func (s *StudentService) NotTryEnroll() {
+func (s *StudentService) NotTryEnroll(mssv string) (*StudentMore, bool) {
+	student, ok := s.StudentStorage.StudentByMSSV(mssv)
+	if !ok {
+		return nil, false
+	}
+	storage.FillStudent(student, s.ProgramStorage, s.FacultyStorage)
 
+	var studentMore StudentMore
+	studentMore.Student = student
+
+	// fill results
+	notSubjects, ok := s.SubjectStorage.NotEnroll(student.ID)
+	if !ok {
+		return &studentMore, true
+	}
+
+	var results []*Result
+	for _, subject := range notSubjects {
+		storage.FillSubject(subject, s.ProgramStorage, s.FacultyStorage, s.TypeSubStorage)
+
+		results = append(results, &Result{Subject: subject})
+	}
+	studentMore.Results = results
+	return &studentMore, true
 }
 
 func (s *StudentService) Save(student *storage.Student) bool {
